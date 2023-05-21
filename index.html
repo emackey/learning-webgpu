@@ -87,8 +87,66 @@
 
         // Set each cell to a random state, then copy the JavaScript array
         // into the storage buffer.
+        /*
         for (let i = 0; i < cellStateArray.length; ++i) {
             cellStateArray[i] = Math.random() > 0.6 ? 1 : 0;
+        }
+        */
+        // Bottom row
+        for(let i = 0; i < 8; ++i) {
+            let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+            let y = 1;
+            let pos = y * GRID_SIZE + x;
+            // ***
+            // ..*  up and to the right
+            // .*.
+            cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
+            cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+            cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+            cellStateArray[1 + pos] = 1;
+        }
+        // Right side
+        for(let i = 0; i < 8; ++i) {
+            let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+            let x = GRID_SIZE - 4;
+            let pos = y * GRID_SIZE + x;
+            // **.
+            // *.*  up and to the left
+            // *..
+            cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
+            cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+            cellStateArray[0 + pos] = 1;
+        }
+        // Top row
+        for(let i = 0; i < 8; ++i) {
+            let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+            let y = GRID_SIZE - 4;
+            let pos = y * GRID_SIZE + x;
+            // .*.
+            // *..  down and to the left
+            // ***
+            cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+            cellStateArray[0 + pos] = 1;
+            cellStateArray[1 + pos] = 1;
+            cellStateArray[2 + pos] = 1;
+        }
+        // Left side
+        for(let i = 0; i < 8; ++i) {
+            let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+            let x = 1;
+            let pos = y * GRID_SIZE + x;
+            // ..*
+            // *.*  down and to the right
+            // .**
+            cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+            cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+            cellStateArray[1 + pos] = 1;
+            cellStateArray[2 + pos] = 1;
         }
         device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
 
@@ -352,6 +410,7 @@
 
             let updateTime = Date.now();
             let elapsed = updateTime - lastUpdate;
+            elapsed = Math.max(1, Math.min(1000, elapsed));
             lastUpdate = updateTime;
             elapsedUniformArray[0] = elapsed;
             device.queue.writeBuffer(elapsedUniformBuffer, 0, elapsedUniformArray);
