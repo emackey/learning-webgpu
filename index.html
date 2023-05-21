@@ -4,10 +4,29 @@
 <head>
     <meta charset="utf-8">
     <title>WebGPU Life</title>
+    <style>
+        body {
+            background: #000;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+        canvas {
+            display: block;
+            position: absolute;
+            width: 98vh;
+            height: 98vh;
+            margin: 0;
+            padding: 0;
+            top: 1vh;
+        }
+    </style>
 </head>
 
 <body>
-    <canvas width="512" height="512"></canvas>
+    <canvas width="1024" height="1024"></canvas>
     <script type="module">
         const canvas = document.querySelector("canvas");
 
@@ -28,7 +47,7 @@
             format: canvasFormat,
         });
 
-        const GRID_SIZE = 32;
+        const GRID_SIZE = 128;
 
         // Create a uniform buffer that describes the grid.
         const uniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
@@ -162,7 +181,7 @@
                     cellActive(cell.x-1, cell.y+1) +
                     cellActive(cell.x, cell.y+1);
 
-                    let i = cellIndex(cell.xy);
+                let i = cellIndex(cell.xy);
 
                 // Conway's game of life rules:
                 switch activeNeighbors {
@@ -262,10 +281,10 @@
             }
         });
 
-        const UPDATE_INTERVAL = 200; // Update every 200ms (5 times/sec)
         let step = 0; // Track how many simulation steps have been run
 
         function updateGrid() {
+            requestAnimationFrame(updateGrid);
 
             // Start a render pass
             const encoder = device.createCommandEncoder();
@@ -301,7 +320,7 @@
         }
 
         // Schedule updateGrid() to run repeatedly
-        setInterval(updateGrid, UPDATE_INTERVAL);
+        requestAnimationFrame(updateGrid);
 
     </script>
 </body>
