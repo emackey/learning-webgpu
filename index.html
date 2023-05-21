@@ -136,7 +136,14 @@
             @group(0) @binding(1) var<uniform> elapsed: i32;
             @group(0) @binding(2) var<storage> cellState: array<i32>;
 
-            const decay = 10.0 * 1000.0;
+            const decay = 30.0 * 1000.0;
+
+            fn hsv2rgb(c: vec3f) -> vec3f
+            {
+                let K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+                let p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+                return c.z * mix(K.xxx, clamp(p - K.xxx, vec3f(0.0), vec3f(1.0)), c.y);
+            }
 
             @vertex
             fn vertexMain(input: VertexInput) -> VertexOutput  {
@@ -151,12 +158,14 @@
                 var color = vec4(vec3(0.2), 1.0); // never was alive
                 if (state > 0.5) {
                     // alive
-                    let fade = max(0.0, 1.0 - state / decay);
-                    color = vec4(fade * 0.7, 1.0, 0.0, 1.0);
+                    //let fade = max(0.0, 1.0 - state / decay);
+                    //color = vec4f(fade * 0.7, 1.0, 0.0, 1.0);
+                    color = vec4f(1.0);
                 } else if (state < -0.5) {
                     // was alive, then died
                     let fade = max(0.0, 1.0 + state / decay);
-                    color = vec4(fade * 0.7 + 0.2, fade * 0.2 + 0.2, 0.2, 1.0);
+                    //color = vec4f(fade * 0.7 + 0.2, fade * 0.2 + 0.2, 0.2, 1.0);
+                    color = vec4f(0.2 + hsv2rgb(vec3(state / 4000.0, 0.8, fade * 0.8)), 1.0);
                 }
 
                 var output: VertexOutput;
@@ -230,7 +239,9 @@
                             cellStateOut[i] = 1;
                         }
                         default: { // Previously live cells that died get older.
-                            if (cellStateIn[i] < 0) {
+                            if (cellStateIn[i] < -45000) {
+                                cellStateOut[i] = 1;
+                            } else if (cellStateIn[i] < 0) {
                                 cellStateOut[i] = cellStateIn[i] - elapsed;
                             } else {
                                 cellStateOut[i] = 0;
