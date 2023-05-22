@@ -61,7 +61,7 @@
             format: canvasFormat,
         });
 
-        const GRID_SIZE = 1024;
+        const GRID_SIZE = 128;
 
         // Create a uniform buffer that describes the grid.
         const gridUniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
@@ -96,7 +96,7 @@
             cellStateArray[i] = Math.random() > 0.6 ? 1 : 0;
         }
         */
-        /*
+
         // Bottom row
         for(let i = 0; i < 8; ++i) {
             let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
@@ -153,8 +153,8 @@
             cellStateArray[1 + pos] = 1;
             cellStateArray[2 + pos] = 1;
         }
-        */
 
+        /*
         const startY = Math.floor((GRID_SIZE / 2) + (breederImage.height / 2));
         for (let y = 0; y < breederHeight; ++y) {
             for (let x = 0; x < breederWidth; ++x) {
@@ -163,6 +163,7 @@
                 cellStateArray[gridPos] = breederData.data[rgbPos] > 128 ? 1 : 0;
             }
         }
+        */
         device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
 
         const vertices = new Float32Array([
@@ -302,7 +303,7 @@
                     // Cell was previously alive
                     switch activeNeighbors {
                         case 2: { // Active cells with 2 neighbors stay active.
-                            if (cellStateIn[i] > 1000 * targetStepsPerSec)
+                            if (cellStateIn[i] > 10 * targetStepsPerSec)
                             {
                                 cellStateOut[i] = -1;
                             } else {
@@ -310,7 +311,7 @@
                             }
                         }
                         case 3: { // Cells with 3 neighbors become or stay active.
-                            if (cellStateIn[i] > 1000 * targetStepsPerSec)
+                            if (cellStateIn[i] > 10 * targetStepsPerSec)
                             {
                                 cellStateOut[i] = -1;
                             } else {
