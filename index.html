@@ -28,6 +28,20 @@
 <body>
     <canvas width="1024" height="1024"></canvas>
     <script type="module">
+        const breederImage = new Image();
+        breederImage.src = 'reference/Breeder_mono.png';
+        await new Promise(resolve => {
+            breederImage.addEventListener("load", resolve);
+        });
+        const breederCanvas = document.createElement('canvas');
+        const breederWidth = breederImage.width;
+        const breederHeight = breederImage.height;
+        breederCanvas.width = breederWidth;
+        breederCanvas.height = breederHeight;
+        const breederContext = breederCanvas.getContext('2d');
+        breederContext.drawImage(breederImage, 0, 0);
+        const breederData = breederContext.getImageData(0, 0, breederWidth, breederHeight);
+
         const canvas = document.querySelector("canvas");
 
         if (!navigator.gpu) {
@@ -47,7 +61,7 @@
             format: canvasFormat,
         });
 
-        const GRID_SIZE = 128;
+        const GRID_SIZE = 1024;
 
         // Create a uniform buffer that describes the grid.
         const gridUniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
@@ -82,6 +96,7 @@
             cellStateArray[i] = Math.random() > 0.6 ? 1 : 0;
         }
         */
+        /*
         // Bottom row
         for(let i = 0; i < 8; ++i) {
             let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
@@ -137,6 +152,16 @@
             cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
             cellStateArray[1 + pos] = 1;
             cellStateArray[2 + pos] = 1;
+        }
+        */
+
+        const startY = Math.floor((GRID_SIZE / 2) + (breederImage.height / 2));
+        for (let y = 0; y < breederHeight; ++y) {
+            for (let x = 0; x < breederWidth; ++x) {
+                const rgbPos = (y * breederWidth + x) * 4;
+                const gridPos = (GRID_SIZE * (startY - y)) + x;
+                cellStateArray[gridPos] = breederData.data[rgbPos] > 128 ? 1 : 0;
+            }
         }
         device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
 
@@ -277,7 +302,7 @@
                     // Cell was previously alive
                     switch activeNeighbors {
                         case 2: { // Active cells with 2 neighbors stay active.
-                            if (cellStateIn[i] > 10 * targetStepsPerSec)
+                            if (cellStateIn[i] > 1000 * targetStepsPerSec)
                             {
                                 cellStateOut[i] = -1;
                             } else {
@@ -285,7 +310,7 @@
                             }
                         }
                         case 3: { // Cells with 3 neighbors become or stay active.
-                            if (cellStateIn[i] > 10 * targetStepsPerSec)
+                            if (cellStateIn[i] > 1000 * targetStepsPerSec)
                             {
                                 cellStateOut[i] = -1;
                             } else {
