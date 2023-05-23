@@ -1,11 +1,10 @@
 struct VertexInput {
     @location(0) pos: vec2f,
-    @builtin(instance_index) instance: u32,
 };
 
 struct VertexOutput {
     @builtin(position) pos: vec4f,
-    @location(0) cellColor: vec4f,
+    @location(0) cell: vec2f,
 };
 
 @group(0) @binding(0) var<uniform> grid: vec2f;
@@ -21,16 +20,25 @@ fn hsv2rgb(c: vec3f) -> vec3f
     return c.z * mix(K.xxx, clamp(p - K.xxx, vec3f(0.0), vec3f(1.0)), c.y);
 }
 
+fn cellIndex(cell: vec2f) -> u32 {
+    return (u32(cell.y) % u32(grid.y)) * u32(grid.x) +
+        (u32(cell.x) % u32(grid.x));
+}
+
 @vertex
 fn vertexMain(input: VertexInput) -> VertexOutput  {
-    let i = f32(input.instance);
-    let cell = vec2f(i % grid.x, floor(i / grid.x));
-    let state = f32(cellState[input.instance]);
+    let cell = (input.pos * 0.5 + 0.5) * grid;
 
-    let cellOffset = cell / grid * 2;
-    let gridPos = (input.pos + 1) / grid - 1 + cellOffset;
+    var output: VertexOutput;
+    output.pos = vec4f(input.pos, 0, 1);
+    output.cell = cell;
+    return output;
+}
 
-    let c = cell / grid;
+@fragment
+fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
+    let state = f32(cellState[cellIndex(input.cell)]);
+
     var color = vec4(vec3(0.2), 1.0); // never was alive
     if (state > 0.5) {
         // alive
@@ -48,13 +56,5 @@ fn vertexMain(input: VertexInput) -> VertexOutput  {
         color = vec4f(fade * 0.1 + 0.2, fade * 0.4 + 0.2, fade * 0.8 + 0.2, 1.0);
     }
 
-    var output: VertexOutput;
-    output.pos = vec4f(gridPos, 0, 1);
-    output.cellColor = color;
-    return output;
-}
-
-@fragment
-fn fragmentMain(input: VertexOutput) -> @location(0) vec4f {
-    return input.cellColor;
+    return color;
 }

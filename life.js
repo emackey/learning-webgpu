@@ -33,7 +33,8 @@ context.configure({
 
 // Max grid size is 5792 (limited by binding size: squared, * 4 bytes per cell)
 // Max binding size is 134217728.
-const GRID_SIZE = 128;
+const GRID_SIZE = 512;
+const GLIDERS_PER_SIDE = GRID_SIZE / 16;
 
 // Create a uniform buffer that describes the grid.
 const gridUniformArray = new Float32Array([GRID_SIZE, GRID_SIZE]);
@@ -70,7 +71,7 @@ for (let i = 0; i < cellStateArray.length; ++i) {
 */
 
 // Bottom row
-for(let i = 0; i < 8; ++i) {
+for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
     let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
     let y = 1;
     let pos = y * GRID_SIZE + x;
@@ -84,7 +85,7 @@ for(let i = 0; i < 8; ++i) {
     cellStateArray[1 + pos] = 1;
 }
 // Right side
-for(let i = 0; i < 8; ++i) {
+for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
     let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
     let x = GRID_SIZE - 4;
     let pos = y * GRID_SIZE + x;
@@ -98,7 +99,7 @@ for(let i = 0; i < 8; ++i) {
     cellStateArray[0 + pos] = 1;
 }
 // Top row
-for(let i = 0; i < 8; ++i) {
+for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
     let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
     let y = GRID_SIZE - 4;
     let pos = y * GRID_SIZE + x;
@@ -112,7 +113,7 @@ for(let i = 0; i < 8; ++i) {
     cellStateArray[2 + pos] = 1;
 }
 // Left side
-for(let i = 0; i < 8; ++i) {
+for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
     let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
     let x = 1;
     let pos = y * GRID_SIZE + x;
@@ -140,13 +141,13 @@ device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
 
 const vertices = new Float32Array([
     //   X,    Y,
-    -0.8, -0.8, // Triangle 1
-    0.8, -0.8,
-    0.8, 0.8,
+    -1, -1, // Lower-right triangle
+    1, -1,
+    1, 1,
 
-    -0.8, -0.8, // Triangle 2
-    0.8, 0.8,
-    -0.8, 0.8,
+    -1, -1, // Upper-left triangle
+    1, 1,
+    -1, 1,
 ]);
 
 const vertexBuffer = device.createBuffer({
@@ -189,11 +190,11 @@ const bindGroupLayout = device.createBindGroupLayout({
     label: "Cell Bind Group Layout",
     entries: [{
         binding: 0,
-        visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
+        visibility: GPUShaderStage.VERTEX | GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
         buffer: {} // Grid uniform buffer
     }, {
         binding: 1,
-        visibility: GPUShaderStage.VERTEX | GPUShaderStage.COMPUTE,
+        visibility: GPUShaderStage.FRAGMENT | GPUShaderStage.COMPUTE,
         buffer: { type: "read-only-storage" } // Cell state input buffer
     }, {
         binding: 2,
@@ -300,7 +301,7 @@ function updateGrid() {
     pass.setPipeline(cellPipeline);
     pass.setBindGroup(0, bindGroups[swap ? 1 : 0]);
     pass.setVertexBuffer(0, vertexBuffer);
-    pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE); // 6 vertices, instanced
+    pass.draw(vertices.length / 2); // 6 vertices
 
     pass.end();
     device.queue.submit([encoder.finish()]);
