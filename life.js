@@ -267,6 +267,7 @@ const simulationPipeline = device.createComputePipeline({
 });
 
 let step = 0; // Track how many simulation steps have been run
+let swap = false;
 
 function updateGrid() {
     requestAnimationFrame(updateGrid);
@@ -276,7 +277,7 @@ function updateGrid() {
 
     const computePass = encoder.beginComputePass();
     computePass.setPipeline(simulationPipeline),
-    computePass.setBindGroup(0, bindGroups[step % 2]);
+    computePass.setBindGroup(0, bindGroups[swap ? 1 : 0]);
 
     const workgroupCount = Math.ceil(GRID_SIZE / WORKGROUP_SIZE);
     computePass.dispatchWorkgroups(workgroupCount, workgroupCount);
@@ -284,6 +285,7 @@ function updateGrid() {
     computePass.end();
 
     step++; // Increment the step count
+    swap = !swap;
 
     const pass = encoder.beginRenderPass({
         colorAttachments: [{
@@ -296,7 +298,7 @@ function updateGrid() {
 
     // Draw the grid.
     pass.setPipeline(cellPipeline);
-    pass.setBindGroup(0, bindGroups[step % 2]);
+    pass.setBindGroup(0, bindGroups[swap ? 1 : 0]);
     pass.setVertexBuffer(0, vertexBuffer);
     pass.draw(vertices.length / 2, GRID_SIZE * GRID_SIZE); // 6 vertices, instanced
 
