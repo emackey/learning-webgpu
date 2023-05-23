@@ -271,6 +271,20 @@ const simulationPipeline = device.createComputePipeline({
 
 let step = 0; // Track how many simulation steps have been run
 let swap = false;
+let turbo = false;
+
+addEventListener('keydown', e => {
+    if (e.key == 'Shift') {
+        turbo = true;
+    }
+});
+addEventListener('keyup', e => {
+    if (e.key == 'Shift') {
+        turbo = false;
+    }
+});
+
+const workgroupCount = Math.ceil(GRID_SIZE / WORKGROUP_SIZE);
 
 function updateGrid() {
     requestAnimationFrame(updateGrid);
@@ -278,17 +292,17 @@ function updateGrid() {
     // Start a render pass
     const encoder = device.createCommandEncoder();
 
-    const computePass = encoder.beginComputePass();
-    computePass.setPipeline(simulationPipeline),
-    computePass.setBindGroup(0, bindGroups[swap ? 1 : 0]);
+    const stepsToTake = turbo ? 25 : 1;
+    for (let s = 0; s < stepsToTake; ++s) {
+        const computePass = encoder.beginComputePass();
+        computePass.setPipeline(simulationPipeline),
+        computePass.setBindGroup(0, bindGroups[swap ? 1 : 0]);
+        computePass.dispatchWorkgroups(workgroupCount, workgroupCount);
+        computePass.end();
 
-    const workgroupCount = Math.ceil(GRID_SIZE / WORKGROUP_SIZE);
-    computePass.dispatchWorkgroups(workgroupCount, workgroupCount);
-
-    computePass.end();
-
-    step++; // Increment the step count
-    swap = !swap;
+        step++; // Increment the step count
+        swap = !swap;
+    }
 
     const pass = encoder.beginRenderPass({
         colorAttachments: [{
