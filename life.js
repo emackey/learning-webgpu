@@ -31,6 +31,8 @@ context.configure({
     format: canvasFormat,
 });
 
+// Max grid size is 5792 (limited by binding size: squared, * 4 bytes per cell)
+// Max binding size is 134217728.
 const GRID_SIZE = 128;
 
 // Create a uniform buffer that describes the grid.
