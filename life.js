@@ -1,5 +1,6 @@
 const breederImage = new Image();
-breederImage.src = 'reference/Breeder_mono.png';
+//breederImage.src = 'reference/Breeder_mono.png';
+breederImage.src = 'reference/MiniPoof_mono.png';
 await new Promise(resolve => {
     breederImage.addEventListener("load", resolve);
 });
@@ -70,73 +71,74 @@ for (let i = 0; i < cellStateArray.length; ++i) {
 }
 */
 
-// Bottom row
-for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
-    let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
-    let y = 1;
-    let pos = y * GRID_SIZE + x;
-    // ***
-    // ..*  up and to the right
-    // .*.
-    cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
-    cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
-    cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
-    cellStateArray[1 + pos] = 1;
-}
-// Right side
-for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
-    let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
-    let x = GRID_SIZE - 4;
-    let pos = y * GRID_SIZE + x;
-    // **.
-    // *.*  up and to the left
-    // *..
-    cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
-    cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
-    cellStateArray[0 + pos] = 1;
-}
-// Top row
-for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
-    let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
-    let y = GRID_SIZE - 4;
-    let pos = y * GRID_SIZE + x;
-    // .*.
-    // *..  down and to the left
-    // ***
-    cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
-    cellStateArray[0 + pos] = 1;
-    cellStateArray[1 + pos] = 1;
-    cellStateArray[2 + pos] = 1;
-}
-// Left side
-for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
-    let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
-    let x = 1;
-    let pos = y * GRID_SIZE + x;
-    // ..*
-    // *.*  down and to the right
-    // .**
-    cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
-    cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
-    cellStateArray[1 + pos] = 1;
-    cellStateArray[2 + pos] = 1;
-}
-
-/*
-const startY = Math.floor((GRID_SIZE / 2) + (breederImage.height / 2));
-for (let y = 0; y < breederHeight; ++y) {
-    for (let x = 0; x < breederWidth; ++x) {
-        const rgbPos = (y * breederWidth + x) * 4;
-        const gridPos = (GRID_SIZE * (startY - y)) + x;
-        cellStateArray[gridPos] = breederData.data[rgbPos] > 128 ? 1 : 0;
+if (GRID_SIZE < 512) {
+    // Bottom row
+    for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
+        let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+        let y = 1;
+        let pos = y * GRID_SIZE + x;
+        // ***
+        // ..*  up and to the right
+        // .*.
+        cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
+        cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+        cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+        cellStateArray[1 + pos] = 1;
+    }
+    // Right side
+    for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
+        let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+        let x = GRID_SIZE - 4;
+        let pos = y * GRID_SIZE + x;
+        // **.
+        // *.*  up and to the left
+        // *..
+        cellStateArray[2 * GRID_SIZE + 0 + pos] = 1;
+        cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+        cellStateArray[0 + pos] = 1;
+    }
+    // Top row
+    for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
+        let x = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+        let y = GRID_SIZE - 4;
+        let pos = y * GRID_SIZE + x;
+        // .*.
+        // *..  down and to the left
+        // ***
+        cellStateArray[2 * GRID_SIZE + 1 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+        cellStateArray[0 + pos] = 1;
+        cellStateArray[1 + pos] = 1;
+        cellStateArray[2 + pos] = 1;
+    }
+    // Left side
+    for(let i = 0; i < GLIDERS_PER_SIDE; ++i) {
+        let y = Math.floor(Math.random() * (GRID_SIZE - 7)) + 4;
+        let x = 1;
+        let pos = y * GRID_SIZE + x;
+        // ..*
+        // *.*  down and to the right
+        // .**
+        cellStateArray[2 * GRID_SIZE + 2 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 0 + pos] = 1;
+        cellStateArray[1 * GRID_SIZE + 2 + pos] = 1;
+        cellStateArray[1 + pos] = 1;
+        cellStateArray[2 + pos] = 1;
+    }
+} else {
+    // Big grids get a breeder
+    const startY = Math.floor((GRID_SIZE / 2) + (breederImage.height / 2));
+    for (let y = 0; y < breederHeight; ++y) {
+        for (let x = 0; x < breederWidth; ++x) {
+            const rgbPos = (y * breederWidth + x) * 4;
+            const gridPos = (GRID_SIZE * (startY - y)) + x;
+            cellStateArray[gridPos] = breederData.data[rgbPos] > 128 ? 1 : 0;
+        }
     }
 }
-*/
 device.queue.writeBuffer(cellStateStorage[0], 0, cellStateArray);
 
 const vertices = new Float32Array([
